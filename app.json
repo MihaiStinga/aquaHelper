@@ -2,14 +2,16 @@
   "expo": {
     "name": "aquaHelper",
     "slug": "aquaHelper",
-    "version": "1.0.0",
+    "version": "0.1.0",
+    "scheme": "aquahelper",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.mihaistinga.aquahelper",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -19,7 +21,20 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "output": "single",
+      "bundler": "metro"
+    },
+    "experiments": {
+      "typedRoutes": true,
+      "baseUrl": "/aquaHelper"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-sharing",
+      "expo-font",
+      "expo-system-ui"
+    ]
   }
 }
