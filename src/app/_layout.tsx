@@ -6,6 +6,7 @@ import { SQLiteProvider } from 'expo-sqlite';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DATABASE_NAME, migrate } from '@/data/db';
 import { StoreProvider, useStore } from '@/data/store';
+import { useNotifications } from '@/data/useNotifications';
 import { useTheme } from '@/theme/theme';
 
 function Loading() {
@@ -20,6 +21,7 @@ function Loading() {
 function Navigator() {
   const t = useTheme();
   const { ready } = useStore();
+  useNotifications();
   if (!ready) return <Loading />;
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: t.bg } }}>
@@ -27,6 +29,11 @@ function Navigator() {
       <Stack.Screen name="parameter/[code]" />
       <Stack.Screen name="log" options={{ presentation: 'modal' }} />
       <Stack.Screen name="manage" />
+      <Stack.Screen name="water-change" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="task-edit" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="alerts" />
+      <Stack.Screen name="rules" />
+      <Stack.Screen name="history" />
     </Stack>
   );
 }
