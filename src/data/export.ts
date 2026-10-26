@@ -97,11 +97,15 @@ export async function exportBackupFile(backup: Backup): Promise<void> {
   await saveText(`aquahelper-backup-${stamp()}.json`, 'application/json', JSON.stringify(backup, null, 2));
 }
 
-/** Lets the user pick a backup JSON; returns null when cancelled. */
-export async function pickBackupFile(): Promise<Backup | null> {
+/** Lets the user pick a JSON file and parses it; returns null when cancelled. */
+export async function pickJsonFile(): Promise<unknown> {
   const res = await DocumentPicker.getDocumentAsync({ type: 'application/json', copyToCacheDirectory: true });
   if (res.canceled) return null;
   const asset = res.assets[0];
   const text = Platform.OS === 'web' && asset.file ? await asset.file.text() : await new File(asset.uri).text();
-  return JSON.parse(text) as Backup;
+  return JSON.parse(text);
+}
+
+export async function pickBackupFile(): Promise<Backup | null> {
+  return (await pickJsonFile()) as Backup | null;
 }

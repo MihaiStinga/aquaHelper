@@ -9,6 +9,7 @@ import { RangeBar } from '@/components/RangeBar';
 import { openLog, useNow } from '@/components/ParamCard';
 import { useStore } from '@/data/store';
 import { exportCsv, exportPdf, shareSummary } from '@/data/export';
+import { describeContext, waterChangeContext } from '@/domain/events';
 import { getParameter } from '@/domain/parameters';
 import { dateTime, formatValue, relativeTime } from '@/domain/format';
 import { inPeriod, summarize, type Period } from '@/domain/stats';
@@ -88,7 +89,7 @@ export default function ParameterScreen() {
 
         <SectionTitle>Measurements{unitLabel}</SectionTitle>
         <Card style={{ paddingVertical: 8, paddingRight: 4, shadowOpacity: 0, elevation: 0 }}>
-          <LineChart series={shown} period={period} range={range} decimals={def.decimals} now={now} />
+          <LineChart series={shown} period={period} range={range} decimals={def.decimals} now={now} markers={store.events.filter((e) => e.kind === 'water_change').map((e) => e.at)} />
         </Card>
 
         <SectionTitle>Summary</SectionTitle>
@@ -114,6 +115,7 @@ export default function ParameterScreen() {
         <Card style={{ shadowOpacity: 0, elevation: 0 }}>
           {[...all].reverse().map((m, i) => {
             const st = statusFor(m.value, range);
+            const ctx = describeContext(waterChangeContext(m, store.events));
             return (
               <Pressable
                 key={m.id}
@@ -123,7 +125,7 @@ export default function ParameterScreen() {
               >
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 17, color: t.text, fontWeight: '500' }}>{f(m.value)} {def.unit}</Text>
-                  <Text style={{ fontSize: 14, color: t.textSecondary, marginTop: 2 }}>{dateTime(m.measuredAt)}</Text>
+                  <Text style={{ fontSize: 14, color: t.textSecondary, marginTop: 2 }}>{dateTime(m.measuredAt)}{ctx ? ` · ${ctx}` : ''}</Text>
                   {!!m.note && <Text style={{ fontSize: 14, color: t.textMuted, marginTop: 2 }}>{m.note}</Text>}
                 </View>
                 <StatusBadge status={st} />

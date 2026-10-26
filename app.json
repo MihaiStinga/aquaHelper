@@ -34,7 +34,13 @@
       "expo-sqlite",
       "expo-sharing",
       "expo-font",
-      "expo-system-ui"
+      "expo-system-ui",
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "alerts"
+        }
+      ]
     ]
   }
 }

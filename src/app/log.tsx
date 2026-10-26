@@ -1,44 +1,24 @@
 import { useMemo, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Header, IconButton, PrimaryButton } from '@/components/ui';
+import { confirmAction, useWhen } from '@/components/WhenField';
+import { describeContext, waterChangeContext } from '@/domain/events';
+import { periodKey } from '@/domain/tasks';
 import { useStore } from '@/data/store';
 import { getParameter, MEASURED_PARAMETERS } from '@/domain/parameters';
 import { parseValue } from '@/domain/format';
 import { useTheme } from '@/theme/theme';
 
-const pad = (n: number) => String(n).padStart(2, '0');
-const toDateText = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const toTimeText = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-
-/** Local date + time text → epoch ms, or null if invalid. */
-function parseWhen(date: string, time: string): number | null {
-  const dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
-  const tm = /^(\d{1,2}):(\d{2})$/.exec(time.trim());
-  if (!dm || !tm) return null;
-  const d = new Date(+dm[1], +dm[2] - 1, +dm[3], +tm[1], +tm[2]);
-  if (d.getMonth() !== +dm[2] - 1 || d.getDate() !== +dm[3] || +tm[1] > 23 || +tm[2] > 59) return null;
-  return d.getTime();
-}
-
-function confirmDelete(): Promise<boolean> {
-  if (Platform.OS === 'web') return Promise.resolve(window.confirm('Delete this measurement?'));
-  return new Promise((resolve) =>
-    Alert.alert('Delete measurement?', undefined, [
-      { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
-      { text: 'Delete', style: 'destructive', onPress: () => resolve(true) },
-    ]),
-  );
-}
-
 /**
  * Log one test session (several parameters at the same time), or edit a
- * single measurement when opened with ?id=.
+ * single measurement when opened with ?id=. Opened from a task (?taskId=),
+ * saving also ticks the task.
  */
 export default function LogScreen() {
   const t = useTheme();
   const store = useStore();
-  const params = useLocalSearchParams<{ code?: string; id?: string }>();
+  const params = useLocalSearchParams<{ code?: string; id?: string; taskId?: string }>();
 
   const existing = useMemo(
     () => (params.id ? Object.values(store.series).flat().find((m) => m.id === params.id) : undefined),
@@ -46,9 +26,7 @@ export default function LogScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [params.id],
   );
-  const start = new Date(existing?.measuredAt ?? Date.now());
-  const [date, setDate] = useState(toDateText(start));
-  const [time, setTime] = useState(toTimeText(start));
+  const { field: whenField, when, error: whenError } = useWhen(existing?.measuredAt);
   const [note, setNote] = useState(existing?.note ?? '');
   const [values, setValues] = useState<Record<string, string>>(existing ? { [existing.code]: String(existing.value) } : {});
   const [saving, setSaving] = useState(false);
@@ -57,14 +35,11 @@ export default function LogScreen() {
     ? [existing.code]
     : [...MEASURED_PARAMETERS.map((p) => p.code)].sort((a, b) => (a === params.code ? -1 : b === params.code ? 1 : 0));
 
-  const when = parseWhen(date, time);
   const entries = Object.entries(values).filter(([, v]) => v.trim());
   const invalid = entries.filter(([, v]) => parseValue(v) == null).map(([c]) => c);
-  const future = when != null && when > Date.now() + 60_000;
-  const error = when == null ? 'Enter date as YYYY-MM-DD and time as HH:MM'
-    : future ? 'The time is in the future'
-    : invalid.length ? `Not a number: ${invalid.map((c) => getParameter(c)!.name).join(', ')}`
-    : null;
+  const error = whenError
+    ?? (invalid.length ? `Not a number: ${invalid.map((c) => getParameter(c)!.name).join(', ')}` : null);
+  const context = when != null ? describeContext(waterChangeContext({ id: '', code: '', value: 0, measuredAt: when, note: null }, store.events)) : null;
   const canSave = !error && entries.length > 0 && !saving;
 
   const close = () => (router.canGoBack() ? router.back() : router.replace('/'));
@@ -78,6 +53,8 @@ export default function LogScreen() {
         await store.updateMeasurement(existing.id, { value: parseValue(raw)!, raw: raw.trim(), measuredAt: when, note: note.trim() || null });
       } else {
         await store.addMeasurements(entries.map(([code, raw]) => ({ code, value: parseValue(raw)!, raw: raw.trim(), measuredAt: when, note: note.trim() || null })));
+        const task = store.tasks.find((x) => x.id === params.taskId);
+        if (task) await store.setTaskDone(task.id, periodKey(task, new Date()), true);
       }
       close();
     } finally {
@@ -86,7 +63,7 @@ export default function LogScreen() {
   };
 
   const remove = async () => {
-    if (existing && (await confirmDelete())) {
+    if (existing && (await confirmAction('Delete this measurement?'))) {
       await store.deleteMeasurement(existing.id);
       close();
     }
@@ -103,13 +80,8 @@ export default function LogScreen() {
       />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
         <Text style={[s.label, { color: t.textSecondary }]}>When</Text>
-        <View style={s.whenRow}>
-          <TextInput value={date} onChangeText={setDate} placeholder="YYYY-MM-DD" placeholderTextColor={t.textMuted} style={[s.input, input, { flex: 3 }]} />
-          <TextInput value={time} onChangeText={setTime} placeholder="HH:MM" placeholderTextColor={t.textMuted} style={[s.input, input, { flex: 2 }]} />
-          <Pressable onPress={() => { const d = new Date(); setDate(toDateText(d)); setTime(toTimeText(d)); }} style={[s.now, { borderColor: t.border }]}>
-            <Text style={{ color: t.primary, fontWeight: '600' }}>Now</Text>
-          </Pressable>
-        </View>
+        {whenField}
+        {context && <Text style={{ color: t.textSecondary, marginTop: 8, fontSize: 14 }}>{context}</Text>}
 
         <Text style={[s.label, { color: t.textSecondary, marginTop: 20 }]}>{existing ? 'Value' : 'Values (fill in what you tested)'}</Text>
         <View style={{ gap: 10 }}>
@@ -148,9 +120,7 @@ export default function LogScreen() {
 
 const s = StyleSheet.create({
   label: { fontSize: 15, marginBottom: 8 },
-  whenRow: { flexDirection: 'row', gap: 10 },
   input: { minWidth: 0, borderWidth: 1, borderRadius: 12, height: 52, paddingHorizontal: 14, fontSize: 17 },
-  now: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, justifyContent: 'center' },
   paramRow: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 12, paddingLeft: 14, paddingRight: 8, height: 56 },
   valueInput: { width: 90, height: 40, borderWidth: 1, borderRadius: 8, textAlign: 'right', paddingHorizontal: 10, fontSize: 17 },
 });
