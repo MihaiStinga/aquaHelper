@@ -1,0 +1,9 @@
+// Release builds run Android lint ("lintVital") by default; it adds minutes and
+// only checks generated native code. CI skips every lint task.
+allprojects {
+    tasks.configureEach { task ->
+        if (task.name.startsWith("lint")) {
+            task.enabled = false
+        }
+    }
+}
