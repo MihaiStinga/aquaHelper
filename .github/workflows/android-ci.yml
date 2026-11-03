@@ -1,9 +1,13 @@
 # Builds the Android app on PRs that can break the native build
 # (dependencies, app config, native-facing build files). JS-only changes are
 # covered by ci.yml's web build and skip this job.
+# Every push to main also builds, to fill the Gradle and ccache caches: only
+# main's caches are visible to release (tag) builds, so this keeps them warm.
 name: Android build
 
 on:
+  push:
+    branches: [main]
   pull_request:
     paths:
       - package.json
