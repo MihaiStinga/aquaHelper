@@ -1,0 +1,51 @@
+name: Build Android APK
+description: Prebuild and assemble the release APK (signed with the debug key; android.yml re-signs it), as fast as possible.
+
+inputs:
+  app-version:
+    description: Version name (tag without the leading v); empty keeps app.json's
+    default: ''
+  version-code:
+    description: Android versionCode
+    default: '1'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
+    - uses: gradle/actions/setup-gradle@v4
+    # Most of the build is compiling React Native's C++; ccache keeps the
+    # objects between runs so only changed native code is recompiled.
+    - uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: android-${{ hashFiles('package-lock.json') }}
+        restore-keys: android-
+        max-size: 2G
+    - run: npm ci
+      shell: bash
+    - run: npx expo prebuild --platform android --no-install --clean
+      shell: bash
+      env:
+        APP_VERSION: ${{ inputs.app-version }}
+        ANDROID_VERSION_CODE: ${{ inputs.version-code }}
+    # Only arm64-v8a (every phone from the last ~8 years, the S21 included)
+    # instead of four ABIs: a quarter of the native compile work.
+    - name: Assemble release
+      shell: bash
+      working-directory: android
+      env:
+        CMAKE_C_COMPILER_LAUNCHER: ccache
+        CMAKE_CXX_COMPILER_LAUNCHER: ccache
+        CCACHE_BASEDIR: ${{ github.workspace }}
+        CCACHE_COMPILERCHECK: content
+      run: >
+        ./gradlew assembleRelease --no-daemon --parallel --build-cache
+        -PreactNativeArchitectures=arm64-v8a
+        --init-script ../ci/no-lint.gradle

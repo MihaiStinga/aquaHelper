@@ -1,0 +1,28 @@
+# Builds the Android app on PRs that can break the native build
+# (dependencies, app config, native-facing build files). JS-only changes are
+# covered by ci.yml's web build and skip this job.
+name: Android build
+
+on:
+  pull_request:
+    paths:
+      - package.json
+      - package-lock.json
+      - app.json
+      - app.config.js
+      - metro.config.js
+      - ci/**
+      - .github/actions/android-build/**
+      - .github/workflows/android-ci.yml
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/android-build
