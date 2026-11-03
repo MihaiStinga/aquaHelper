@@ -46,7 +46,15 @@ function xWindow(period: Period, series: Measurement[], now: number) {
  * (a spline would draw values that were never measured), y-axis fitted to
  * the data, ideal range as a tinted band. Tap a point to read it exactly.
  */
-export function LineChart({ series, period, range, decimals, now }: { series: Measurement[]; period: Period; range: Range; decimals: number; now: number }) {
+export function LineChart({ series, period, range, decimals, now, markers = [] }: {
+  series: Measurement[];
+  period: Period;
+  range: Range;
+  decimals: number;
+  now: number;
+  /** Times of water changes, drawn as vertical lines. */
+  markers?: number[];
+}) {
   const t = useTheme();
   const [width, setWidth] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -64,7 +72,12 @@ export function LineChart({ series, period, range, decimals, now }: { series: Me
     return { xw, ys, X, Y, iw, ih, labelEvery };
   }, [series, width, period, range, now]);
 
-  const tickDecimals = geo ? (geo.ys.ticks.some((v) => !Number.isInteger(v)) ? Math.max(decimals, 1) : 0) : 0;
+  // Enough decimals that no two tick labels read the same (e.g. 0.45 vs 0.5).
+  let tickDecimals = 0;
+  if (geo) {
+    tickDecimals = geo.ys.ticks.some((v) => !Number.isInteger(v)) ? Math.max(decimals, 1) : 0;
+    while (tickDecimals < 4 && new Set(geo.ys.ticks.map((v) => v.toFixed(tickDecimals))).size < geo.ys.ticks.length) tickDecimals++;
+  }
 
   return (
     <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={{ height: H }}>
@@ -97,6 +110,12 @@ export function LineChart({ series, period, range, decimals, now }: { series: Me
               </G>
             ))}
           </G>
+          {markers.filter((at) => at >= geo.xw.from && at <= geo.xw.to).map((at) => (
+            <G key={`m${at}`}>
+              <Line x1={geo.X(at)} x2={geo.X(at)} y1={PAD.top - 4} y2={H - PAD.bottom} stroke={t.primary} strokeWidth={1.5} strokeOpacity={0.6} />
+              <SvgText fontFamily={FONT} x={geo.X(at)} y={PAD.top - 8} fontSize={11} fill={t.primary} textAnchor="middle">WC</SvgText>
+            </G>
+          ))}
           {series.length > 1 && (
             <Path
               d={series.map((m, i) => `${i ? 'L' : 'M'}${geo.X(m.measuredAt).toFixed(1)} ${geo.Y(m.value).toFixed(1)}`).join(' ')}

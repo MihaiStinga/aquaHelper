@@ -1,0 +1,900 @@
+[
+  {
+    "id": "nh3-free-toxic",
+    "title": "Toxic ammonia: {value} free NH₃",
+    "message": "Free (un-ionised) ammonia is {value}. Above 0.02 ppm it damages gills; fish may gasp, clamp fins or hide.",
+    "severity": "critical",
+    "tags": [
+      "nitrogen"
+    ],
+    "when": {
+      "param": "nh3_free",
+      "op": ">",
+      "value": 0.02,
+      "maxAgeHours": 48
+    },
+    "advice": [
+      "Change 30–50% of the water now, temperature-matched and dechlorinated.",
+      "Stop feeding for 24 h and remove anything decaying.",
+      "Retest ammonia in 12–24 h."
+    ]
+  },
+  {
+    "id": "nh3-high",
+    "title": "Ammonia very high: {value}",
+    "message": "Total ammonia is {value}. The filter is not keeping up (new tank, overfeeding, a dead fish or a cleaned filter).",
+    "severity": "critical",
+    "tags": [
+      "nitrogen"
+    ],
+    "when": {
+      "param": "nh3",
+      "op": ">=",
+      "value": 1
+    },
+    "advice": [
+      "Large water change today.",
+      "Check for a dead fish or rotting food.",
+      "Do not clean the filter media now."
+    ]
+  },
+  {
+    "id": "nh3-present",
+    "title": "Ammonia detected: {value}",
+    "message": "A cycled tank should read 0. Its toxicity rises with pH and temperature; see Free Ammonia.",
+    "severity": "warning",
+    "tags": [
+      "nitrogen"
+    ],
+    "when": {
+      "param": "nh3",
+      "op": "between",
+      "value": [
+        0.25,
+        0.99
+      ]
+    },
+    "advice": [
+      "Feed less for a few days.",
+      "Retest in 24 h; change 25% of the water if it stays."
+    ]
+  },
+  {
+    "id": "nh3-after-water-change",
+    "title": "Imbalance after water change",
+    "message": "Ammonia is {value} {daysAfter} days after a {percent}% water change. Something keeps producing it.",
+    "severity": "critical",
+    "tags": [
+      "nitrogen",
+      "water-change"
+    ],
+    "when": {
+      "param": "nh3",
+      "op": ">",
+      "value": 0,
+      "hoursAfterWaterChange": {
+        "min": 24,
+        "max": 96
+      }
+    },
+    "advice": [
+      "Change water again urgently (30–50%).",
+      "Watch the fish closely for the next days and retest daily.",
+      "Look for the source: dead fish, decaying plants, overfeeding, filter stopped."
+    ]
+  },
+  {
+    "id": "nh3-rising",
+    "title": "Ammonia rising",
+    "message": "Ammonia went up by {change} ppm in 3 days (now {value}).",
+    "severity": "warning",
+    "tags": [
+      "nitrogen",
+      "trend"
+    ],
+    "when": {
+      "param": "nh3",
+      "change": {
+        "withinHours": 72,
+        "op": ">=",
+        "value": 0.25
+      }
+    },
+    "advice": [
+      "Check the filter is running and was not over-cleaned.",
+      "Reduce feeding."
+    ]
+  },
+  {
+    "id": "no2-high",
+    "title": "Nitrite high: {value}",
+    "message": "Nitrite blocks oxygen transport in the blood (brown gills, gasping).",
+    "severity": "critical",
+    "tags": [
+      "nitrogen"
+    ],
+    "when": {
+      "param": "no2",
+      "op": ">=",
+      "value": 0.5
+    },
+    "advice": [
+      "Change 30–50% of the water now.",
+      "Retest daily until it reads 0."
+    ]
+  },
+  {
+    "id": "no2-present",
+    "title": "Nitrite detected: {value}",
+    "message": "A cycled tank should read 0 nitrite.",
+    "severity": "warning",
+    "tags": [
+      "nitrogen"
+    ],
+    "when": {
+      "param": "no2",
+      "op": "between",
+      "value": [
+        0.1,
+        0.49
+      ]
+    },
+    "advice": [
+      "Feed less and retest in 24 h.",
+      "Change 25% of the water if it does not drop."
+    ]
+  },
+  {
+    "id": "no3-high",
+    "title": "Nitrate high: {value}",
+    "message": "Long-term nitrate above 40 ppm stresses fish and feeds algae.",
+    "severity": "warning",
+    "tags": [
+      "nitrogen"
+    ],
+    "when": {
+      "param": "no3",
+      "op": "between",
+      "value": [
+        40.1,
+        80
+      ]
+    },
+    "advice": [
+      "Increase water change size or frequency.",
+      "Check for overfeeding and dead spots in the substrate."
+    ]
+  },
+  {
+    "id": "no3-very-high",
+    "title": "Nitrate very high: {value}",
+    "message": "Above 80 ppm nitrate becomes harmful to most fish.",
+    "severity": "critical",
+    "tags": [
+      "nitrogen"
+    ],
+    "when": {
+      "param": "no3",
+      "op": ">",
+      "value": 80
+    },
+    "advice": [
+      "Do two 30% water changes a day apart.",
+      "Test your tap water: it may already carry nitrate."
+    ]
+  },
+  {
+    "id": "no3-low-plants",
+    "title": "Nitrate low for plants: {value}",
+    "message": "Planted tanks usually need 5–20 ppm; below 5 plants can yellow from the old leaves and algae can win.",
+    "severity": "info",
+    "tags": [
+      "plants",
+      "nitrogen"
+    ],
+    "when": {
+      "param": "no3",
+      "op": "<",
+      "value": 5
+    },
+    "advice": [
+      "Check your fertilizer dose includes nitrogen."
+    ]
+  },
+  {
+    "id": "no3-climbing",
+    "title": "Nitrate building up",
+    "message": "Nitrate rose by {change} ppm in a week (now {value}).",
+    "severity": "info",
+    "tags": [
+      "nitrogen",
+      "trend"
+    ],
+    "when": {
+      "param": "no3",
+      "change": {
+        "withinHours": 168,
+        "op": ">=",
+        "value": 15
+      }
+    },
+    "advice": [
+      "Water changes are not keeping up: change more or more often.",
+      "Feed less."
+    ]
+  },
+  {
+    "id": "ph-neons",
+    "title": "pH {value}: watch the neons",
+    "message": "pH is above 7.5. Neon tetras prefer soft, acidic water; watch for faded colour, clamped fins or hiding.",
+    "severity": "warning",
+    "tags": [
+      "ph",
+      "fish"
+    ],
+    "when": {
+      "param": "ph",
+      "op": ">",
+      "value": 7.5
+    },
+    "advice": [
+      "Check CO₂ is running (pH rises when it stops).",
+      "Do not chase pH quickly with chemicals; stability matters more."
+    ]
+  },
+  {
+    "id": "ph-low",
+    "title": "pH low: {value}",
+    "message": "Below pH 6.0 the nitrifying bacteria slow down, so ammonia can build up.",
+    "severity": "warning",
+    "tags": [
+      "ph"
+    ],
+    "when": {
+      "param": "ph",
+      "op": "<",
+      "value": 6.0
+    },
+    "advice": [
+      "Check KH: a low buffer lets pH fall.",
+      "Test ammonia."
+    ]
+  },
+  {
+    "id": "ph-swing",
+    "title": "pH swinging by {change}",
+    "message": "pH moved by {change} within 24 h. Swings stress fish more than a steady value.",
+    "severity": "warning",
+    "tags": [
+      "ph",
+      "trend"
+    ],
+    "when": {
+      "param": "ph",
+      "change": {
+        "withinHours": 24,
+        "measure": "spread",
+        "op": ">",
+        "value": 0.5
+      }
+    },
+    "advice": [
+      "With CO₂ injection a drop of ~1 during the light period is expected; more than that, reduce CO₂.",
+      "Check KH."
+    ]
+  },
+  {
+    "id": "kh-critical",
+    "title": "KH very low: {value}",
+    "message": "Below 2 dKH (~36 ppm) the water has almost no buffer and pH can crash, especially with CO₂.",
+    "severity": "critical",
+    "tags": [
+      "hardness",
+      "ph"
+    ],
+    "when": {
+      "param": "kh",
+      "op": "<",
+      "value": 36,
+      "maxAgeHours": 336
+    },
+    "advice": [
+      "Water change with your tap water.",
+      "Reduce CO₂ until KH is back up."
+    ]
+  },
+  {
+    "id": "kh-low",
+    "title": "KH low: {value}",
+    "message": "Under 3 dKH (~54 ppm) pH becomes unstable.",
+    "severity": "warning",
+    "tags": [
+      "hardness",
+      "ph"
+    ],
+    "when": {
+      "param": "kh",
+      "op": "between",
+      "value": [
+        36,
+        54
+      ],
+      "maxAgeHours": 336
+    },
+    "advice": [
+      "Watch pH swings.",
+      "Avoid large CO₂ increases."
+    ]
+  },
+  {
+    "id": "co2-high",
+    "title": "CO₂ high: {value}",
+    "message": "Calculated CO₂ above 30 ppm can make fish gasp at the surface.",
+    "severity": "warning",
+    "tags": [
+      "co2"
+    ],
+    "when": {
+      "param": "co2",
+      "op": "between",
+      "value": [
+        30.1,
+        40
+      ],
+      "maxAgeHours": 24
+    },
+    "advice": [
+      "Watch the fish at the end of the light period.",
+      "Lower the bubble rate a little.",
+      "Compare with the drop checker (lime green = ~30 ppm)."
+    ]
+  },
+  {
+    "id": "co2-dangerous",
+    "title": "CO₂ dangerous: {value}",
+    "message": "Above 40 ppm CO₂ fish can suffocate.",
+    "severity": "critical",
+    "tags": [
+      "co2"
+    ],
+    "when": {
+      "param": "co2",
+      "op": ">",
+      "value": 40,
+      "maxAgeHours": 24
+    },
+    "advice": [
+      "Turn the CO₂ down now and add surface agitation.",
+      "Note: the KH/pH formula overestimates CO₂ if other buffers (e.g. phosphate) are present."
+    ]
+  },
+  {
+    "id": "co2-low",
+    "title": "CO₂ low for plants: {value}",
+    "message": "Calculated CO₂ is under 15 ppm; plants grow slowly and algae get the upper hand.",
+    "severity": "info",
+    "tags": [
+      "co2",
+      "plants"
+    ],
+    "when": {
+      "param": "co2",
+      "op": "<",
+      "value": 15,
+      "maxAgeHours": 24
+    },
+    "advice": [
+      "Check the bubble counter and the CO₂ canister.",
+      "Drop checker should be lime green by the time the lights are on."
+    ]
+  },
+  {
+    "id": "temp-high",
+    "title": "Temperature high: {value}",
+    "message": "Above 28 °C the water holds less oxygen and fish metabolism speeds up.",
+    "severity": "warning",
+    "tags": [
+      "temperature"
+    ],
+    "when": {
+      "param": "temp",
+      "op": ">",
+      "value": 28,
+      "maxAgeHours": 48
+    },
+    "advice": [
+      "Check the heater thermostat.",
+      "Add surface agitation; in summer use a fan over the water."
+    ]
+  },
+  {
+    "id": "temp-low",
+    "title": "Temperature low: {value}",
+    "message": "Below 22 °C most tropical fish get sluggish and prone to disease.",
+    "severity": "warning",
+    "tags": [
+      "temperature"
+    ],
+    "when": {
+      "param": "temp",
+      "op": "<",
+      "value": 22,
+      "maxAgeHours": 48
+    },
+    "advice": [
+      "Check the heater works and is the right size for the tank."
+    ]
+  },
+  {
+    "id": "temp-swing",
+    "title": "Temperature changed by {change}",
+    "message": "Temperature moved by more than 2 °C within a day.",
+    "severity": "warning",
+    "tags": [
+      "temperature",
+      "trend"
+    ],
+    "when": {
+      "param": "temp",
+      "change": {
+        "withinHours": 24,
+        "measure": "spread",
+        "op": ">",
+        "value": 2
+      }
+    },
+    "advice": [
+      "Match new water temperature during water changes.",
+      "Check the heater."
+    ]
+  },
+  {
+    "id": "low-oxygen-risk",
+    "title": "Oxygen risk: warm water and high CO₂",
+    "message": "Warm water holds less oxygen and CO₂ is high at the same time.",
+    "severity": "critical",
+    "tags": [
+      "co2",
+      "temperature",
+      "oxygen"
+    ],
+    "when": {
+      "all": [
+        {
+          "param": "temp",
+          "op": ">",
+          "value": 27,
+          "maxAgeHours": 24
+        },
+        {
+          "param": "co2",
+          "op": ">",
+          "value": 25,
+          "maxAgeHours": 24
+        }
+      ]
+    },
+    "advice": [
+      "Reduce CO₂ and add surface agitation.",
+      "Watch for fish at the surface."
+    ]
+  },
+  {
+    "id": "o2-low",
+    "title": "Oxygen low: {value}",
+    "message": "Under 5 ppm dissolved oxygen fish breathe faster; under 4 it is dangerous.",
+    "severity": "warning",
+    "tags": [
+      "oxygen"
+    ],
+    "when": {
+      "param": "o2",
+      "op": "<",
+      "value": 5,
+      "maxAgeHours": 24
+    },
+    "advice": [
+      "Increase surface agitation or add an air stone at night.",
+      "Check the filter flow."
+    ]
+  },
+  {
+    "id": "chlorine",
+    "title": "Chlorine detected: {value}",
+    "message": "Any chlorine kills beneficial bacteria and burns gills.",
+    "severity": "critical",
+    "tags": [
+      "water-change"
+    ],
+    "when": {
+      "param": "cl",
+      "op": ">",
+      "value": 0,
+      "maxAgeHours": 48
+    },
+    "advice": [
+      "Add dechlorinator for the whole tank volume now.",
+      "Always dose dechlorinator before or with new water."
+    ]
+  },
+  {
+    "id": "gh-low",
+    "title": "GH low: {value}",
+    "message": "Under 3 dGH (~54 ppm) plants and snails can run short of calcium and magnesium.",
+    "severity": "info",
+    "tags": [
+      "hardness",
+      "plants"
+    ],
+    "when": {
+      "param": "gh",
+      "op": "<",
+      "value": 54,
+      "maxAgeHours": 336
+    },
+    "advice": [
+      "A GH remineraliser or a Ca/Mg supplement raises it."
+    ]
+  },
+  {
+    "id": "gh-high-soft-water-fish",
+    "title": "GH high for soft-water fish: {value}",
+    "message": "Above 12 dGH (~214 ppm). Neons and other soft-water fish live longer in softer water.",
+    "severity": "info",
+    "tags": [
+      "hardness",
+      "fish"
+    ],
+    "when": {
+      "param": "gh",
+      "op": ">",
+      "value": 214,
+      "maxAgeHours": 336
+    },
+    "advice": [
+      "Mix in RO or rain water at water changes if your fish need it."
+    ]
+  },
+  {
+    "id": "po4-high",
+    "title": "Phosphate high: {value}",
+    "message": "Above 3 ppm phosphate fuels algae, especially with weak light or CO₂.",
+    "severity": "warning",
+    "tags": [
+      "plants",
+      "algae"
+    ],
+    "when": {
+      "param": "po4",
+      "op": ">",
+      "value": 3
+    },
+    "advice": [
+      "Reduce phosphate dosing and feeding.",
+      "Test the tap water."
+    ]
+  },
+  {
+    "id": "po4-low-plants",
+    "title": "Phosphate low for plants: {value}",
+    "message": "Under 0.1 ppm plants can stall and green spot algae appears on slow leaves.",
+    "severity": "info",
+    "tags": [
+      "plants",
+      "algae"
+    ],
+    "when": {
+      "param": "po4",
+      "op": "<",
+      "value": 0.1
+    },
+    "advice": [
+      "Check the fertilizer includes phosphate."
+    ]
+  },
+  {
+    "id": "no3-po4-ratio-low",
+    "title": "Nitrate-limited (NO₃:PO₄ = {ratio})",
+    "message": "Nitrate {num} vs phosphate {den}. A ratio under 5:1 favours cyanobacteria (blue-green slime).",
+    "severity": "info",
+    "tags": [
+      "plants",
+      "algae"
+    ],
+    "when": {
+      "ratio": {
+        "num": "no3",
+        "den": "po4"
+      },
+      "op": "<",
+      "value": 5
+    },
+    "advice": [
+      "Add nitrogen or reduce phosphate; aim for about 10:1."
+    ]
+  },
+  {
+    "id": "no3-po4-ratio-high",
+    "title": "Phosphate-limited (NO₃:PO₄ = {ratio})",
+    "message": "Nitrate {num} vs phosphate {den}. A ratio over 30:1 favours green spot algae.",
+    "severity": "info",
+    "tags": [
+      "plants",
+      "algae"
+    ],
+    "when": {
+      "ratio": {
+        "num": "no3",
+        "den": "po4"
+      },
+      "op": ">",
+      "value": 30
+    },
+    "advice": [
+      "Add phosphate or reduce nitrogen; aim for about 10:1."
+    ]
+  },
+  {
+    "id": "fe-high",
+    "title": "Iron high: {value}",
+    "message": "Above 0.5 ppm iron can feed algae and harm shrimp.",
+    "severity": "warning",
+    "tags": [
+      "plants"
+    ],
+    "when": {
+      "param": "fe",
+      "op": ">",
+      "value": 0.5
+    },
+    "advice": [
+      "Pause iron dosing until it drops."
+    ]
+  },
+  {
+    "id": "fe-low-plants",
+    "title": "Iron low for plants: {value}",
+    "message": "Under 0.05 ppm new leaves can come in pale (chlorosis).",
+    "severity": "info",
+    "tags": [
+      "plants"
+    ],
+    "when": {
+      "param": "fe",
+      "op": "<",
+      "value": 0.05
+    },
+    "advice": [
+      "Check the micro-nutrient fertilizer dose."
+    ]
+  },
+  {
+    "id": "k-low-plants",
+    "title": "Potassium low: {value}",
+    "message": "Under 5 ppm older leaves get pinholes and yellow edges.",
+    "severity": "info",
+    "tags": [
+      "plants"
+    ],
+    "when": {
+      "param": "k",
+      "op": "<",
+      "value": 5
+    },
+    "advice": [
+      "Increase the potassium part of the fertilizer."
+    ]
+  },
+  {
+    "id": "si-diatoms",
+    "title": "Silicate high: {value}",
+    "message": "Above 2 ppm silicate feeds brown diatom algae.",
+    "severity": "info",
+    "tags": [
+      "algae"
+    ],
+    "when": {
+      "param": "si",
+      "op": ">",
+      "value": 2
+    },
+    "advice": [
+      "Common in new tanks and fades; otherwise check the tap water and substrate."
+    ]
+  },
+  {
+    "id": "tds-climbing",
+    "title": "TDS climbing: {change} in 30 days",
+    "message": "Dissolved solids keep rising (now {value}); minerals and waste are accumulating.",
+    "severity": "info",
+    "tags": [
+      "trend",
+      "water-change"
+    ],
+    "when": {
+      "param": "tds",
+      "change": {
+        "withinHours": 720,
+        "op": ">",
+        "value": 50
+      },
+      "maxAgeHours": 720
+    },
+    "advice": [
+      "Larger or more frequent water changes bring it back down."
+    ]
+  },
+  {
+    "id": "outside-ideal",
+    "title": "{param} is {status}: {value}",
+    "message": "{param} is outside the ideal range you set.",
+    "severity": "warning",
+    "tags": [
+      "range"
+    ],
+    "when": {
+      "any": [
+        {
+          "param": "ph",
+          "outsideRange": true
+        },
+        {
+          "param": "temp",
+          "outsideRange": true
+        },
+        {
+          "param": "kh",
+          "outsideRange": true,
+          "maxAgeHours": 336
+        },
+        {
+          "param": "gh",
+          "outsideRange": true,
+          "maxAgeHours": 336
+        },
+        {
+          "param": "no3",
+          "outsideRange": true
+        },
+        {
+          "param": "po4",
+          "outsideRange": true
+        },
+        {
+          "param": "k",
+          "outsideRange": true
+        },
+        {
+          "param": "fe",
+          "outsideRange": true
+        },
+        {
+          "param": "ca",
+          "outsideRange": true
+        },
+        {
+          "param": "si",
+          "outsideRange": true
+        },
+        {
+          "param": "o2",
+          "outsideRange": true
+        },
+        {
+          "param": "tds",
+          "outsideRange": true
+        },
+        {
+          "param": "salinity",
+          "outsideRange": true
+        },
+        {
+          "param": "co2",
+          "outsideRange": true,
+          "maxAgeHours": 24
+        }
+      ]
+    },
+    "each": true
+  },
+  {
+    "id": "water-change-due",
+    "title": "Weekly water change due",
+    "message": "Last water change was {days} days ago. Your routine is 15–20% weekly.",
+    "severity": "info",
+    "tags": [
+      "water-change",
+      "maintenance"
+    ],
+    "when": {
+      "daysSince": "water_change",
+      "op": "between",
+      "value": [
+        7,
+        14
+      ]
+    },
+    "advice": [
+      "Use \"I want to do a water change\" on the Aquarium screen."
+    ]
+  },
+  {
+    "id": "water-change-overdue",
+    "title": "No water change in {days} days",
+    "message": "It has been over 2 weeks since the last water change.",
+    "severity": "warning",
+    "tags": [
+      "water-change",
+      "maintenance"
+    ],
+    "when": {
+      "daysSince": "water_change",
+      "op": ">",
+      "value": 14
+    },
+    "advice": [
+      "Change 20–30% now, then return to weekly."
+    ]
+  },
+  {
+    "id": "filter-clean-soon",
+    "title": "Filter clean due in a week",
+    "message": "The filter was cleaned {days} days ago; the 3-month cleaning is coming up.",
+    "severity": "info",
+    "tags": [
+      "maintenance"
+    ],
+    "when": {
+      "daysSince": "filter_clean",
+      "op": "between",
+      "value": [
+        83,
+        90
+      ]
+    },
+    "advice": [
+      "Plan it a few days away from a water change, so the bacteria recover."
+    ]
+  },
+  {
+    "id": "filter-clean-due",
+    "title": "Filter clean due",
+    "message": "The filter was cleaned {days} days ago (every 3 months).",
+    "severity": "warning",
+    "tags": [
+      "maintenance"
+    ],
+    "when": {
+      "daysSince": "filter_clean",
+      "op": ">",
+      "value": 90
+    },
+    "advice": [
+      "Rinse the media in removed tank water, never tap water.",
+      "Clean pipes and strainers at the same time."
+    ]
+  },
+  {
+    "id": "weekly-tests",
+    "title": "Time to test: {params}",
+    "message": "Not tested for over a week: {params}.",
+    "severity": "info",
+    "tags": [
+      "maintenance"
+    ],
+    "when": {
+      "staleTests": [
+        "ph",
+        "kh",
+        "gh",
+        "nh3",
+        "no2",
+        "no3",
+        "po4",
+        "fe",
+        "k"
+      ],
+      "days": 7
+    }
+  }
+]

@@ -2,7 +2,7 @@
 
 Aquarium water-parameter tracker for Android and the web. One codebase (Expo SDK 58, React Native, TypeScript), data stored locally in SQLite.
 
-**Phase 1 (this version):** water parameters, ideal ranges (Low / Ideal / High), history, charts, CSV/PDF/JSON export and backup, calculated CO₂ and free ammonia. Next phases: water changes, checklists, rules and push notifications, fauna, Firestore sync. See the [plan](https://claude.ai/artifact/8yiNuXQPZ9nmo11mBpLkWC).
+**Done:** water parameters, ideal ranges (Low / Ideal / High), history, charts, CSV/PDF/JSON export and backup, calculated CO₂ and free ammonia (phase 1); water changes with a guided checklist and "time since water change" on every test, filter cleaning log, daily/weekly/monthly tasks, 42 JSON alert rules with advice, local notifications with a daily summary at 14:00 (phases 2–4). **Next:** fauna, Firestore sync. Rules format: [docs/rules.md](docs/rules.md). See the [plan](https://claude.ai/artifact/8yiNuXQPZ9nmo11mBpLkWC).
 
 ## Run locally
 
@@ -22,8 +22,9 @@ npm run typecheck
 | --- | --- |
 | `src/app/` | Screens (Expo Router). `(tabs)/` is the bottom navigation. |
 | `src/components/` | UI pieces: cards, range bar, chart, dialogs. |
-| `src/domain/` | Pure logic, no React: parameter catalogue, status, stats, chemistry, formatting, chart scale. Unit-tested. |
-| `src/data/` | SQLite migrations, queries, in-memory store, export/backup. |
+| `src/domain/` | Pure logic, no React: parameter catalogue, status, stats, chemistry, formatting, chart scale, rule engine, tasks, water-change context. Unit-tested. |
+| `src/data/` | SQLite migrations, queries, in-memory store, export/backup, notifications. |
+| `src/rules/default-rules.json` | Built-in alert rules; see [docs/rules.md](docs/rules.md). |
 | `src/theme/` | Light and dark colours. |
 | `.github/workflows/` | CI, web deploy, Android release. |
 
