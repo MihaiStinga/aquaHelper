@@ -36,7 +36,8 @@ runs:
         APP_VERSION: ${{ inputs.app-version }}
         ANDROID_VERSION_CODE: ${{ inputs.version-code }}
     # Only arm64-v8a (every phone from the last ~8 years, the S21 included)
-    # instead of four ABIs: a quarter of the native compile work.
+    # instead of four ABIs: a quarter of the native compile work. No R8
+    # (about 2 min): a slightly larger APK, nothing else changes.
     - name: Assemble release
       shell: bash
       working-directory: android
@@ -48,4 +49,5 @@ runs:
       run: >
         ./gradlew assembleRelease --no-daemon --parallel --build-cache
         -PreactNativeArchitectures=arm64-v8a
+        -Pandroid.enableMinifyInReleaseBuilds=false
         --init-script ../ci/no-lint.gradle
